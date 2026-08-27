@@ -14,13 +14,22 @@ const FILES = {
 FILES.en["style.css"] = FILES.ko["style.css"];
 FILES.en["main.js"] = FILES.ko["main.js"];
 
+let activeRenderer = null;
+let languageListenerRegistered = false;
+
 export function initDemoEditor() {
   const code = document.querySelector("[data-demo-code]");
   const tab = document.querySelector("[data-demo-tab]");
   const buttons = Array.from(document.querySelectorAll("[data-demo-file]"));
-  if (!code || !tab || !buttons.length) return;
 
-  let activeButton = buttons.find(function (button) { return button.getAttribute("aria-pressed") === "true"; }) || buttons[0];
+  if (!code || !tab || !buttons.length) {
+    activeRenderer = null;
+    return;
+  }
+
+  let activeButton = buttons.find(function (button) {
+    return button.getAttribute("aria-pressed") === "true";
+  }) || buttons[0];
 
   function render(button) {
     const language = document.documentElement.lang === "en" ? "en" : "ko";
@@ -36,7 +45,22 @@ export function initDemoEditor() {
     });
   }
 
-  buttons.forEach(function (button) { button.addEventListener("click", function () { render(button); }); });
-  document.addEventListener("pagerivet:languagechange", function () { render(activeButton); });
+  buttons.forEach(function (button) {
+    button.addEventListener("click", function () {
+      render(button);
+    });
+  });
+
+  activeRenderer = function () {
+    render(activeButton);
+  };
+
+  if (!languageListenerRegistered) {
+    languageListenerRegistered = true;
+    document.addEventListener("pagerivet:languagechange", function () {
+      if (activeRenderer) activeRenderer();
+    });
+  }
+
   render(activeButton);
 }

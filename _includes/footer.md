@@ -6,7 +6,7 @@
       <div><h4 data-i18n="footer.support">지원</h4><div><a href="{{ site.data.site.repository_url }}" target="_blank" rel="noopener noreferrer">GitHub</a></div><div><a href="{{ site.data.site.community_url }}" target="_blank" rel="noopener noreferrer">Discord</a></div><div><a href="{{ site.data.site.support_email }}" data-i18n="footer.contact">문의하기</a></div></div>
       <div><h4 data-i18n="footer.thanks">고마운 플랫폼</h4><div><a href="{{ site.data.site.cozit_url }}" target="_blank" rel="noopener noreferrer">Cozit</a></div><div><a href="{{ site.data.site.disquiet_url }}" target="_blank" rel="noopener noreferrer">Disquiet</a></div></div>
     </div>
-    <div class="copy">© {{ 'now' | date: '%Y' }} PageRivet · Reference brand page concept</div>
+    <div class="copy">© {{ 'now' | date: '%Y' }} PageRivet · <span data-i18n="footer.contact_label">문의:</span> <a href="{{ site.data.site.support_email }}">pagerivet.support@gmail.com</a></div>
   </div>
 </footer>
 <button class="back-to-top" type="button" data-back-to-top aria-label="맨 위로 이동">↑</button>

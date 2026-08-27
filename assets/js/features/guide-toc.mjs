@@ -1,4 +1,11 @@
+let activeObserver = null;
+
 export function initGuideToc() {
+  if (activeObserver) {
+    activeObserver.disconnect();
+    activeObserver = null;
+  }
+
   const toc = document.querySelector("[data-guide-toc]");
   if (!toc) return;
 
@@ -9,7 +16,7 @@ export function initGuideToc() {
 
   if (!sections.length) return;
 
-  const observer = new IntersectionObserver(function (entries) {
+  activeObserver = new IntersectionObserver(function (entries) {
     entries.forEach(function (entry) {
       if (!entry.isIntersecting) return;
       links.forEach(function (link) {
@@ -19,6 +26,6 @@ export function initGuideToc() {
   }, { rootMargin: "-20% 0px -65% 0px", threshold: 0 });
 
   sections.forEach(function (section) {
-    observer.observe(section);
+    activeObserver.observe(section);
   });
 }

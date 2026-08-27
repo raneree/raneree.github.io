@@ -10,7 +10,7 @@
       "commands": [
         {
           "name": "export_project",
-          "description": "Requests an export through PageRivet's existing Export workflow. PageRivet always shows a final approval prompt, even when ordinary MCP writes are automatically approved. A one-time configuration is never saved as a user preset."
+          "description": "Requests an export through PageRivet's existing Export workflow. The request follows the active MCP approval policy, while validation errors still block execution. A one-time configuration is never saved as a user preset."
         },
         {
           "name": "get_application_info",

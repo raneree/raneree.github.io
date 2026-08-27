@@ -19,6 +19,7 @@ show_release_toast: true
         <a class="btn secondary" href="{{ '/guide.html' | relative_url }}" data-i18n="home.guide">시작 가이드 보기</a>
       </div>
       <div class="version platform-note" role="note">
+        <span class="status-pulse" aria-hidden="true"></span>
         <strong data-i18n="home.platform.title">지원 환경</strong>
         <span data-i18n="home.platform.description">현재 PageRivet은 Windows x64 전용으로 제공됩니다. macOS와 Linux는 지원하지 않습니다.</span>
       </div>
@@ -57,7 +58,7 @@ show_release_toast: true
       </div>
       <div class="bottom"><span data-i18n="mock.history">기록</span><span data-i18n="mock.errors">오류</span><span data-i18n="mock.mcp_log">MCP 로그</span><span data-i18n="mock.console">콘솔</span></div>
       </div>
-      <div class="mock-example-card" role="note"><strong data-i18n="mock.example.label">화면 예시:</strong><span data-i18n="mock.example.description">제품을 설명하기 위한 예시 입니다. 화면의 코드, 시작하기 버튼 등은 실제로 작동하지 않습니다.</span></div>
+      <div class="mock-example-card" role="note"><span class="status-pulse" aria-hidden="true"></span><strong data-i18n="mock.example.label">화면 예시:</strong><span data-i18n="mock.example.description">제품을 설명하기 위한 예시 입니다. 화면의 코드, 시작하기 버튼 등은 실제로 작동하지 않습니다.</span></div>
     </div>
   </div>
 </section>

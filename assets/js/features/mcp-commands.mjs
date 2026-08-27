@@ -3,6 +3,13 @@ import { createModalController } from "../ui/modal.mjs";
 
 let commandData = null;
 let loading = null;
+let languageListenerRegistered = false;
+
+function statusText() {
+  return currentLanguage() === "en"
+    ? "Could not load the command data."
+    : "명령어 데이터를 불러오지 못했습니다.";
+}
 
 function renderGroups(container) {
   if (!commandData || !container) return;
@@ -36,7 +43,12 @@ function renderTotal(data) {
 }
 
 function ensureLoaded(container) {
-  if (commandData) return Promise.resolve(commandData);
+  if (commandData) {
+    renderTotal(commandData);
+    renderGroups(container);
+    return Promise.resolve(commandData);
+  }
+
   if (!loading) {
     loading = fetchProjectJson("assets/data/mcp-commands.json").then(function (data) {
       const commands = data.groups.reduce(function (all, group) {
@@ -44,18 +56,21 @@ function ensureLoaded(container) {
       }, []);
       if (data.total !== commands.length) throw new Error("MCP total does not match commands length.");
       commandData = data;
-      renderTotal(data);
-      renderGroups(container);
       return data;
-    }).catch(function (error) {
-      if (container) {
-        container.className = "";
-        container.innerHTML = '<div class="data-status">명령어 데이터를 불러오지 못했습니다.</div>';
-      }
-      throw error;
     });
   }
-  return loading;
+
+  return loading.then(function (data) {
+    renderTotal(data);
+    renderGroups(container);
+    return data;
+  }).catch(function (error) {
+    if (container) {
+      container.className = "";
+      container.innerHTML = '<div class="data-status">' + statusText() + '</div>';
+    }
+    throw error;
+  });
 }
 
 export function initMcpCommands() {
@@ -67,11 +82,9 @@ export function initMcpCommands() {
 
   const controller = modal ? createModalController(modal, "[data-close-mcp-commands]") : null;
 
-  if (totalTargets.length) {
-    ensureLoaded(container).catch(function (error) {
-      console.error(error);
-    });
-  }
+  ensureLoaded(container).catch(function (error) {
+    console.error(error);
+  });
 
   if (trigger && controller) {
     trigger.addEventListener("click", function () {
@@ -82,7 +95,10 @@ export function initMcpCommands() {
     });
   }
 
-  document.addEventListener("pagerivet:languagechange", function () {
-    renderGroups(container);
-  });
+  if (!languageListenerRegistered) {
+    languageListenerRegistered = true;
+    document.addEventListener("pagerivet:languagechange", function () {
+      renderGroups(document.querySelector("[data-mcp-command-groups]"));
+    });
+  }
 }

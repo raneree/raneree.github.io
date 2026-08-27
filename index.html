@@ -7,21 +7,24 @@
   <meta name="robots" content="noindex">
   <script>
     try {
-      if (sessionStorage.getItem("pagerivet.preview-transition") === "pending") {
-        document.documentElement.classList.add("preview-transition-pending");
-      }
+      const savedTheme = localStorage.getItem("pagerivet.theme");
+      const preferredTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      document.documentElement.dataset.theme = savedTheme || preferredTheme;
     } catch (_error) {
-      // 저장소를 사용할 수 없으면 일반 로딩 화면을 표시합니다.
+      document.documentElement.dataset.theme = "light";
     }
   </script>
   <style>
     @view-transition { navigation: none; }
-    :root { color-scheme: light dark; font-family: system-ui, sans-serif; }
-    html.preview-transition-pending .preview-status { opacity: 0; }
-    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #0b0f18; color: #f5f7fb; }
-    .preview-status { width: min(36rem, calc(100% - 3rem)); padding: 2rem; border: 1px solid #2a3140; border-radius: 1rem; background: #141a26; }
+    :root { color-scheme: light; font-family: system-ui, sans-serif; }
+    html[data-theme="dark"] { color-scheme: dark; }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #f7f8fc; color: #151926; }
+    .preview-status { width: min(36rem, calc(100% - 3rem)); padding: 2rem; border: 1px solid #dfe3ed; border-radius: 1rem; background: #fff; }
     .preview-status h1 { margin: 0 0 .75rem; font-size: 1.25rem; }
-    .preview-status p { margin: 0; color: #aeb8ca; line-height: 1.7; }
+    .preview-status p { margin: 0; color: #667085; line-height: 1.7; }
+    html[data-theme="dark"] body { background: #080b12; color: #f1f4fa; }
+    html[data-theme="dark"] .preview-status { border-color: #2c374b; background: #121925; }
+    html[data-theme="dark"] .preview-status p { color: #aab4c6; }
   </style>
 </head>
 <body>

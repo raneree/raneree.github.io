@@ -80,7 +80,7 @@ body_class: guide-theme
           <li><b>파일 선택</b><span>프로젝트 목록에서 편집할 HTML, CSS 또는 JavaScript 파일을 선택합니다.</span></li>
           <li><b>코드 편집</b><span>필요한 내용을 수정하고 관련 파일의 변경 범위를 함께 확인합니다.</span></li>
           <li><b>변경 상태 확인</b><span>아직 적용되지 않은 편집 내용이 있는지 확인합니다.</span></li>
-          <li><b>적용 및 검증</b><span>변경을 적용하고 HTML, CSS, JavaScript 검증 결과를 확인합니다.</span></li>
+          <li><b>검증 및 적용</b><span>HTML, CSS, JavaScript 검증 결과를 확인하고 유효한 변경을 프로젝트에 적용합니다.</span></li>
           <li><b>결과 확인</b><span>미리보기와 오류·콘솔 영역에서 적용 결과를 확인합니다.</span></li>
         </ol>
         <div class="guide-warning"><strong>미적용 편집 내용</strong><p>에디터에 입력한 내용과 실제 프로젝트 상태가 다를 수 있습니다. 파일을 전환하거나 AI 작업을 시작하기 전에 미적용 변경 여부를 확인하세요.</p></div>
@@ -89,20 +89,20 @@ body_class: guide-theme
       <section class="guide-section" id="preview">
         <div class="section-kicker">04 · Preview</div>
         <h2>웹 페이지 미리보기</h2>
-        <p class="guide-intro">프로젝트에 존재하는 HTML 페이지를 Preview에 표시하고, 적용된 결과를 기준으로 화면과 동작을 확인합니다.</p>
+        <p class="guide-intro">프로젝트에 존재하는 HTML 페이지를 미리보기에 표시하고, 적용된 결과를 기준으로 화면과 동작을 확인합니다.</p>
         <ul class="guide-checklist">
           <li>미리볼 HTML 페이지를 선택합니다.</li>
-          <li>코드를 적용한 뒤 Preview를 새로고침합니다.</li>
+          <li>코드를 적용한 뒤 미리보기를 새로고침합니다.</li>
           <li>CSS 디자인과 JavaScript 동작을 확인합니다.</li>
           <li>오류가 있으면 콘솔 정보와 관련 파일을 함께 확인합니다.</li>
         </ul>
-        <div class="guide-note"><strong>표시 기준</strong><span>Preview는 현재 활성 프로젝트에 존재하며 프로젝트에 적용된 HTML 페이지를 기준으로 표시됩니다.</span></div>
+        <div class="guide-note"><strong>표시 기준</strong><span>미리보기는 현재 활성 프로젝트에 존재하며 프로젝트에 적용된 HTML 페이지를 기준으로 표시됩니다.</span></div>
       </section>
 
       <section class="guide-section" id="validation">
         <div class="section-kicker">05 · Validation</div>
         <h2>검증과 오류 확인</h2>
-        <p class="guide-intro">변경사항을 적용하기 전에 정적 구문 문제를 확인하고, 실행 중 발생한 문제는 Preview 오류와 콘솔 정보에서 구분해 확인합니다.</p>
+        <p class="guide-intro">변경사항을 적용하기 전에 정적 구문 문제를 확인하고, 실행 중 발생한 문제는 미리보기 오류와 콘솔 정보에서 구분해 확인합니다.</p>
         <div class="guide-columns">
           <article>
             <h3>코드 검증</h3>
@@ -119,7 +119,7 @@ body_class: guide-theme
               <li>JavaScript 실행 예외 확인</li>
               <li>브라우저 콘솔 메시지 확인</li>
               <li>관련 파일 수정 후 다시 적용</li>
-              <li>Preview에서 결과 재확인</li>
+              <li>미리보기에서 결과 재확인</li>
             </ul>
           </article>
         </div>
@@ -142,7 +142,7 @@ body_class: guide-theme
         <button class="guide-command-card" type="button" data-open-mcp-commands aria-haspopup="dialog">
           <span class="section-kicker">MCP Command Reference</span>
           <strong>사용 가능한 MCP 명령어 보기</strong>
-          <p>현재 PageRivet 2.3.3에서 사용할 수 있는 <span data-mcp-total>56</span>개 명령어를 제공합니다. 원하는 작업을 자연어로 요청하면 AI 클라이언트가 필요한 명령어를 선택합니다.</p>
+          <p>현재 PageRivet {{ site.data.download.version }}에서 사용할 수 있는 <span data-mcp-total>56</span>개 명령어를 제공합니다. 원하는 작업을 자연어로 요청하면 AI 클라이언트가 필요한 명령어를 선택합니다.</p>
           <span class="guide-command-action">명령어 목록 열기 →</span>
         </button>
       </section>
@@ -154,7 +154,7 @@ body_class: guide-theme
         <div class="guide-steps">
           <article class="guide-step"><span>1</span><h3>방식 선택</h3><p>내보내기 프리셋 또는 일회성 설정을 선택합니다.</p></article>
           <article class="guide-step"><span>2</span><h3>정보 확인</h3><p>프로젝트, 형식, 출력 위치, 덮어쓰기와 경고 정보를 확인합니다.</p></article>
-          <article class="guide-step"><span>3</span><h3>정책에 따라 적용</h3><p>현재 MCP 승인 정책과 검증 결과에 따라 내보내기를 진행합니다.</p></article>
+          <article class="guide-step"><span>3</span><h3>내보내기 실행</h3><p>현재 MCP 승인 정책과 검증 결과에 따라 내보내기를 진행합니다.</p></article>
         </div>
         <div class="guide-warning"><strong>검증 오류</strong><p>검증 오류가 있는 작업은 자동 적용 정책에서도 실행되지 않습니다. 오류를 해결한 뒤 다시 요청하세요.</p></div>
       </section>
@@ -175,9 +175,9 @@ body_class: guide-theme
         <h2>지원 및 문의</h2>
         <p class="guide-intro">가이드로 해결되지 않는 문제는 프로젝트 정보와 재현 절차를 함께 알려주세요.</p>
         <div class="support-links">
-          <a href="{{ site.data.site.github_url }}">GitHub 저장소</a>
-          <a href="{{ site.data.site.discord_url }}">Discord 커뮤니티</a>
-          <a href="mailto:{{ site.data.site.email }}">이메일 문의</a>
+          <a href="{{ site.data.site.repository_url }}" target="_blank" rel="noopener noreferrer">GitHub 저장소</a>
+          <a href="{{ site.data.site.community_url }}" target="_blank" rel="noopener noreferrer">Discord 커뮤니티</a>
+          <a href="{{ site.data.site.support_email }}">이메일 문의</a>
         </div>
       </section>
     </div>
@@ -191,7 +191,7 @@ body_class: guide-theme
       <div><div class="section-kicker">PageRivet MCP</div><h2 id="mcp-command-title">사용 가능한 MCP 명령어</h2></div>
       <button type="button" class="mcp-command-close" data-close-mcp-commands aria-label="명령어 목록 닫기">×</button>
     </div>
-    <p class="mcp-command-intro">현재 PageRivet 2.3.3에서 실제 제공되는 <span data-mcp-total>56</span>개 MCP 명령어입니다. 사용자가 직접 입력하거나 기억할 필요는 없습니다.</p>
+    <p class="mcp-command-intro">현재 PageRivet {{ site.data.download.version }}에서 실제 제공되는 <span data-mcp-total>56</span>개 MCP 명령어입니다. 사용자가 직접 입력하거나 기억할 필요는 없습니다.</p>
     <div class="mcp-command-groups" data-mcp-command-groups aria-live="polite">
       <p class="data-status">MCP 명령어 목록을 불러오는 중입니다.</p>
     </div>

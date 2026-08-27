@@ -1,8 +1,9 @@
 "use strict";
 
 (function () {
-  const PREVIEW_TRANSITION_KEY = "pagerivet.preview-transition";
-  const PREVIEW_TRANSITION_DURATION = 220;
+  let appModulePromise = null;
+  let previewNavigationInitialized = false;
+  let isNavigating = false;
 
   const PAGE_SOURCES = Object.freeze({
     home: "index.md",
@@ -332,8 +333,27 @@
     document.head.appendChild(meta);
   }
 
-  function applyRenderedDocument(renderedHtml, cssText, pageKey) {
-    const parsed = new DOMParser().parseFromString(renderedHtml, "text/html");
+  function parseRenderedPage(renderedHtml) {
+    return new DOMParser().parseFromString(renderedHtml, "text/html");
+  }
+
+  function updateMeta(name, content) {
+    const existing = document.head.querySelector('meta[name="' + name + '"]');
+    if (!content) {
+      if (existing) existing.remove();
+      return;
+    }
+
+    if (existing) {
+      existing.content = content;
+      return;
+    }
+
+    appendMeta(name, content);
+  }
+
+  function applyInitialDocument(renderedHtml, cssText, pageKey) {
+    const parsed = parseRenderedPage(renderedHtml);
     const parsedTitle = parsed.querySelector("title");
     const parsedDescription = parsed.querySelector('meta[name="description"]');
     const parsedThemeColor = parsed.querySelector('meta[name="theme-color"]');
@@ -344,7 +364,6 @@
 
     document.documentElement.lang = parsed.documentElement.lang || "ko";
     document.documentElement.dataset.theme = getInitialTheme();
-
     document.head.replaceChildren();
 
     const charset = document.createElement("meta");
@@ -371,32 +390,51 @@
     document.body.dataset.previewPage = pageKey;
   }
 
+  function syncNavigationState(pageKey) {
+    document.querySelectorAll(".site-header [data-nav-id]").forEach(function (link) {
+      link.removeAttribute("aria-current");
+      link.removeAttribute("aria-disabled");
+      link.removeAttribute("tabindex");
+    });
+
+    const current = document.querySelector('.site-header [data-nav-id="' + pageKey + '"]');
+    if (!current) return;
+
+    current.setAttribute("aria-current", "page");
+    current.setAttribute("aria-disabled", "true");
+    current.setAttribute("tabindex", "-1");
+  }
+
+  function applyPageDocument(renderedHtml, pageKey) {
+    const parsed = parseRenderedPage(renderedHtml);
+    const nextMain = parsed.querySelector("#main-content");
+    const currentMain = document.querySelector("#main-content");
+    const parsedTitle = parsed.querySelector("title");
+    const parsedDescription = parsed.querySelector('meta[name="description"]');
+    const parsedThemeColor = parsed.querySelector('meta[name="theme-color"]');
+
+    if (!nextMain || !currentMain) {
+      throw new Error("미리보기 본문을 찾지 못했습니다.");
+    }
+
+    document.title = parsedTitle ? parsedTitle.textContent : "PageRivet";
+    updateMeta("description", parsedDescription ? parsedDescription.content : "");
+    updateMeta("theme-color", parsedThemeColor ? parsedThemeColor.content : "#0b0f18");
+
+    document.body.className = parsed.body.className;
+    document.body.dataset.previewPage = pageKey;
+    currentMain.replaceWith(document.importNode(nextMain, true));
+    syncNavigationState(pageKey);
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }
+
   function prefersReducedMotion() {
     return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   }
 
-  function clearTransitionFlag() {
-    document.documentElement.classList.remove("preview-transition-pending");
-
-    try {
-      sessionStorage.removeItem(PREVIEW_TRANSITION_KEY);
-    } catch (_error) {
-      // 저장소를 사용할 수 없어도 페이지 전환은 계속합니다.
-    }
-  }
-
-  function playPreviewEntryTransition() {
-    const shouldAnimate = document.documentElement.classList.contains("preview-transition-pending");
-    clearTransitionFlag();
-
-    if (!shouldAnimate || prefersReducedMotion()) {
-      return;
-    }
-
-    document.body.classList.add("preview-page-entering");
-    window.setTimeout(function () {
-      document.body.classList.remove("preview-page-entering");
-    }, 300);
+  function pageKeyFromUrl(url) {
+    const requestedPage = url.searchParams.get("page") || "home";
+    return requestedPage === "index" ? "home" : requestedPage;
   }
 
   function isPreviewPageNavigation(link, url) {
@@ -413,11 +451,57 @@
       return false;
     }
 
-    const pageKey = url.searchParams.get("page") || "home";
-    return Object.prototype.hasOwnProperty.call(PAGE_SOURCES, pageKey);
+    return Object.prototype.hasOwnProperty.call(PAGE_SOURCES, pageKeyFromUrl(url));
+  }
+
+  function loadAppModule() {
+    if (!appModulePromise) {
+      appModulePromise = import("./assets/js/main.mjs");
+    }
+    return appModulePromise;
+  }
+
+  async function navigatePreview(url, pushHistory) {
+    const pageKey = pageKeyFromUrl(url);
+    if (isNavigating || !PAGE_SOURCES[pageKey]) return;
+    isNavigating = true;
+
+    try {
+      const page = await buildPreviewPage(pageKey);
+      const apply = function () {
+        applyPageDocument(page.template, pageKey);
+      };
+
+      if (!prefersReducedMotion() && typeof document.startViewTransition === "function") {
+        const transition = document.startViewTransition(apply);
+        await transition.finished.catch(function (error) {
+          if (!error || error.name !== "AbortError") throw error;
+        });
+      } else {
+        apply();
+      }
+
+      if (pushHistory) {
+        window.history.pushState({ pageKey: pageKey }, "", url.href);
+      }
+
+      const app = await loadAppModule();
+      if (typeof app.refreshPageFeatures === "function") {
+        app.refreshPageFeatures();
+      }
+
+      console.info("[PageRivet Preview] " + page.pageSource + " 렌더링 완료");
+    } catch (error) {
+      console.error("[PageRivet Preview] 페이지 전환 실패", error);
+    } finally {
+      isNavigating = false;
+    }
   }
 
   function initPreviewNavigation() {
+    if (previewNavigationInitialized) return;
+    previewNavigationInitialized = true;
+
     document.addEventListener("click", function (event) {
       if (
         event.defaultPrevented ||
@@ -439,31 +523,16 @@
       }
 
       event.preventDefault();
+      navigatePreview(url, true);
+    });
 
-      function navigate() {
-        window.location.assign(url.href);
-      }
-
-      if (prefersReducedMotion()) {
-        navigate();
-        return;
-      }
-
-      try {
-        sessionStorage.setItem(PREVIEW_TRANSITION_KEY, "pending");
-      } catch (_error) {
-        // 저장소를 사용할 수 없어도 퇴장 애니메이션은 실행합니다.
-      }
-
-      document.body.classList.add("preview-page-leaving");
-      window.setTimeout(navigate, PREVIEW_TRANSITION_DURATION);
+    window.addEventListener("popstate", function () {
+      navigatePreview(new URL(window.location.href), false);
     });
   }
 
   function showError(error) {
     console.error("[PageRivet Preview]", error);
-    clearTransitionFlag();
-
     document.title = "PageRivet 미리보기 오류";
     document.body.className = "";
     document.body.innerHTML = "";
@@ -481,9 +550,7 @@
     document.body.appendChild(main);
   }
 
-  async function renderPreview() {
-    const requestedPage = new URL(window.location.href).searchParams.get("page") || "home";
-    const pageKey = requestedPage === "index" ? "home" : requestedPage;
+  async function buildPreviewPage(pageKey) {
     const pageSource = PAGE_SOURCES[pageKey];
 
     if (!pageSource) {
@@ -538,12 +605,21 @@
     template = replaceIncludes(template, includes);
     template = renderTemplate(template, context);
 
-    applyRenderedDocument(template, cssText, pageKey);
-    playPreviewEntryTransition();
-    await import("./assets/js/main.mjs");
-    initPreviewNavigation();
+    return {
+      template: template,
+      cssText: cssText,
+      pageKey: pageKey,
+      pageSource: pageSource
+    };
+  }
 
-    console.info("[PageRivet Preview] " + pageSource + " 렌더링 완료");
+  async function renderPreview() {
+    const pageKey = pageKeyFromUrl(new URL(window.location.href));
+    const page = await buildPreviewPage(pageKey);
+    applyInitialDocument(page.template, page.cssText, pageKey);
+    await loadAppModule();
+    initPreviewNavigation();
+    console.info("[PageRivet Preview] " + page.pageSource + " 렌더링 완료");
   }
 
   renderPreview().catch(showError);
