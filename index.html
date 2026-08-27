@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PageRivet 미리보기 불러오는 중</title>
+  <meta name="robots" content="noindex">
+  <script>
+    try {
+      if (sessionStorage.getItem("pagerivet.preview-transition") === "pending") {
+        document.documentElement.classList.add("preview-transition-pending");
+      }
+    } catch (_error) {
+      // 저장소를 사용할 수 없으면 일반 로딩 화면을 표시합니다.
+    }
+  </script>
+  <style>
+    @view-transition { navigation: none; }
+    :root { color-scheme: light dark; font-family: system-ui, sans-serif; }
+    html.preview-transition-pending .preview-status { opacity: 0; }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #0b0f18; color: #f5f7fb; }
+    .preview-status { width: min(36rem, calc(100% - 3rem)); padding: 2rem; border: 1px solid #2a3140; border-radius: 1rem; background: #141a26; }
+    .preview-status h1 { margin: 0 0 .75rem; font-size: 1.25rem; }
+    .preview-status p { margin: 0; color: #aeb8ca; line-height: 1.7; }
+  </style>
+</head>
+<body>
+  <main class="preview-status" id="preview-status" aria-live="polite">
+    <h1>PageRivet 홈페이지를 불러오는 중입니다.</h1>
+    <p>현재 Jekyll 원본과 공통 데이터를 미리보기용 HTML로 조립하고 있습니다.</p>
+    <noscript>미리보기에는 JavaScript가 필요합니다.</noscript>
+  </main>
+  <script src="script.js" defer></script>
+</body>
+</html>
