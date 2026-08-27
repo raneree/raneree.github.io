@@ -1,6 +1,6 @@
 title: PageRivet
 url: "https://raneree.github.io"
-baseurl: "/PageRivet"
+baseurl: ""
 lang: ko
 timezone: Asia/Seoul
 markdown: kramdown
